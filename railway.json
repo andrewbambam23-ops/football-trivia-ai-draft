@@ -1,0 +1,9 @@
+{
+  "name": "football-trivia-ai-draft",
+  "start": "npm run start",
+  "env": [
+    "DATABASE_URL",
+    "REDIS_URL",
+    "OPENAI_API_KEY"
+  ]
+}

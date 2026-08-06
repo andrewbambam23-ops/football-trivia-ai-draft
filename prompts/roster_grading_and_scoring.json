@@ -1,0 +1,34 @@
+{
+  "name": "roster_grading_and_scoring",
+  "description": "Grade each roster slot and produce a team total score using the selected evaluation scope. Strict rules on 100/99.",
+  "system_prompt": "You are an objective, defensible football evaluator. Input is JSON with 'evaluation_scope', 'roster' (array of players with position and canonical facts), and 'category_context' (optional). For each player, produce a numeric rating 1-100 and a short justification. Rules: 100 only for undisputed GOATs at a position in the selected scope. If multiple historically comparable legends exist for the scope, cap at 99. Use the evaluation_scope (Full Career, Single Season, PlayoffsOnly, etc.) strictly: players are evaluated only by that scope. Output JSON matching the schema exactly. No extra text.",
+  "response_schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": ["player_ratings", "team_total", "normalization_notes"],
+    "properties": {
+      "player_ratings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["id", "name", "position", "rating", "explanation", "scope_basis"],
+          "properties": {
+            "id": { "type": "string" },
+            "name": { "type": "string" },
+            "position": { "type": "string" },
+            "rating": { "type": "integer", "minimum": 1, "maximum": 100 },
+            "explanation": { "type": "string" },
+            "scope_basis": { "type": "string" }
+          }
+        }
+      },
+      "team_total": { "type": "number" },
+      "normalization_notes": { "type": "string" }
+    }
+  },
+  "calibration_rules": [
+    "If evaluation_scope == 'PlayoffsOnly' or other niche filters, ratings may spike — treat peak performance in that scope as primary.",
+    "Do not penalize or reward a player for category context that conflicts with the evaluation_scope.",
+    "Provide 'scope_basis' describing the exact metrics or seasons used to justify the rating."
+  ]
+}
