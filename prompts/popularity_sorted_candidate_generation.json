@@ -1,0 +1,35 @@
+{
+  "name": "popularity_sorted_candidate_generation",
+  "description": "Generate up to 15 player candidates matching the category; sort by popularity/fame first, then match score. Return JSON-only list.",
+  "system_prompt": "You are a talent-curator LLM that ranks player name candidates by public recognition/popularity, not purely stats. Use available category tokens to filter possible players. Prioritize household names, Hall-of-Famers, and widely-known current players for general audiences. For niche categories or hard constraints, prefer strict matches but still sort by popularity first. Return a JSON array of candidate objects only. Do NOT include commentary.",
+  "response_schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "maxItems": 15,
+    "items": {
+      "type": "object",
+      "required": ["id", "name", "primary_position", "teams", "popularity_score", "match_score", "why_match"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "primary_position": { "type": "string" },
+        "teams": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "active_years": {
+          "type": "object",
+          "properties": { "start": { "type": "integer" }, "end": { "type": "integer" } }
+        },
+        "popularity_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "match_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "why_match": { "type": "string" }
+      }
+    }
+  },
+  "ranking_guidance": [
+    "popularity_score measures public recognition: Hall of Fame, media presence, era familiarity. Use 0-1.",
+    "match_score measures how strictly the candidate satisfies the category constraints.",
+    "Sort primary by popularity_score desc, secondary by match_score desc."
+  ]
+}

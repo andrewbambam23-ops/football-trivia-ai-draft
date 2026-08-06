@@ -1,0 +1,64 @@
+{
+  "name": "dynamic_player_validation",
+  "description": "System prompt for validating whether a candidate player strictly matches a generated category. Strict true/false output and structured JSON only.",
+  "system_prompt": "You are an expert football historian and strict data validator. Input will be a JSON object with 'category' (human-readable), 'category_tokens' (array of normalized constraints), 'player_candidate' (partial player object), and 'evaluation_scope' (Full Career | Single Season | PlayoffsOnly | ChampionshipOnly | BowlOnly | ConferenceChampionshipOnly). Always respond with valid JSON that matches the provided JSON Schema exactly. Do NOT include extra commentary. Validation rules: accept only if the player's canonical facts unambiguously satisfy every constraint. If a constraint depends on ambiguous data (e.g., 'college team changed name' or 'player played only a practice game'), treat as invalid and explain reason. If the player would reveal the answer to the current trivia question (see 'redaction_rules'), mark fields to redact and return 'would_spoil': true. Use the 'redaction_rules' to identify fields to disable in the Search UI. Respect timeframes precisely (decade/year) and treat positional flexibility conservatively (e.g., 'Wide Receiver' category excludes players whose only appearances are at QB).",
+  "redaction_rules": [
+    "If any category token asks for a property explicitly (jersey number, specific team membership, active year, conference), set that field in 'redacted_fields'.",
+    "If a category's question string contains the player's attribute (name, number, team), mark 'would_spoil': true and include 'redacted_fields'.",
+    "Always provide 'safe_search_filters' listing fields that can be shown (true/false per field)."
+  ],
+  "response_schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": ["valid", "player_canonical", "reason", "would_spoil", "redacted_fields", "safe_search_filters"],
+    "properties": {
+      "valid": { "type": "boolean" },
+      "player_canonical": {
+        "type": "object",
+        "required": ["id", "name", "primary_position", "teams", "active_years"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "primary_position": { "type": "string" },
+          "teams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["team_name", "start_year", "end_year"],
+              "properties": {
+                "team_name": { "type": "string" },
+                "start_year": { "type": "integer" },
+                "end_year": { "type": "integer" }
+              }
+            }
+          },
+          "active_years": {
+            "type": "object",
+            "required": ["start", "end"],
+            "properties": { "start": { "type": "integer" }, "end": { "type": "integer" } }
+          },
+          "jersey_numbers": { "type": "array", "items": { "type": "integer" } },
+          "college": { "type": ["string", "null"] }
+        }
+      },
+      "reason": { "type": "string" },
+      "would_spoil": { "type": "boolean" },
+      "redacted_fields": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "safe_search_filters": {
+        "type": "object",
+        "properties": {
+          "show_name": { "type": "boolean" },
+          "show_primary_position": { "type": "boolean" },
+          "show_teams": { "type": "boolean" },
+          "show_active_years": { "type": "boolean" },
+          "show_jersey_numbers": { "type": "boolean" },
+          "show_college": { "type": "boolean" }
+        },
+        "required": []
+      }
+    }
+  }
+}
