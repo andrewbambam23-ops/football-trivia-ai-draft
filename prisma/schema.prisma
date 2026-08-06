@@ -1,4 +1,5 @@
-// prisma/schema.prisma
+// updated prisma/schema.prisma
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -8,10 +9,58 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  matches   Match[]  @relation("UserMatches")
+}
+
 model Match {
   id            String   @id @default(uuid())
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   status        String
   metadata      Json?
+  hostId        String?
+  host          User?    @relation(fields: [hostId], references: [id])
+  players       PlayerInMatch[]
+  rosterId      String?
+}
+
+model Player {
+  id             String   @id @default(uuid())
+  externalId     String   @unique
+  name           String
+  primaryPosition String
+  activeStart    Int?
+  activeEnd      Int?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+}
+
+model PlayerInMatch {
+  id        String   @id @default(uuid())
+  match     Match    @relation(fields: [matchId], references: [id])
+  matchId   String
+  player    Player   @relation(fields: [playerId], references: [id])
+  playerId  String
+  slot      Int
+  pickedBy  String?
+}
+
+model Roster {
+  id        String   @id @default(uuid())
+  matchId   String
+  name      String?
+  slots     Json
+}
+
+model DraftPick {
+  id        String   @id @default(uuid())
+  matchId   String
+  playerId  String
+  slot      Int
+  pickedAt  DateTime @default(now())
 }

@@ -1,0 +1,6 @@
+// prompts/trivia_validation.json
+{
+  "name": "trivia_validation",
+  "description": "Validate a candidate answer against a trivia question",
+  "system_prompt": "You are a strict trivia validator. Input: {question, candidateAnswer}. Output: {valid: boolean, confidence: number, reason: string}. Return JSON only."
+}

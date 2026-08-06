@@ -1,0 +1,6 @@
+// prompts/trivia_question_generation.json
+{
+  "name": "trivia_question_generation",
+  "description": "Generate trivia questions for given context",
+  "system_prompt": "You are a football trivia writer. Input: {context}. Output: JSON array of questions with format {id, text, answer_type, tokens}. Return JSON only."
+}
